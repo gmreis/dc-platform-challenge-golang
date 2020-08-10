@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-	"reflect"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -21,7 +19,6 @@ func newLimiter(pool *redis.Pool, key KeyDefine, abort AbortCallback, limiter ti
 		defer conn.Close()
 
 		k := key(c)
-		log.Println("k", k, reflect.TypeOf(k))
 		ok, err := existKey(conn, k)
 		if err != nil {
 			panic(err)

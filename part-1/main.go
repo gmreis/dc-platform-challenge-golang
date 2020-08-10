@@ -39,14 +39,12 @@ func abortRequest(c *gin.Context) {
 	c.AbortWithStatus(http.StatusForbidden)
 }
 
-func setupRouter(poolRedis *redis.Pool) *gin.Engine {
-	router := gin.Default()
-
+func setupRouter(poolRedis *redis.Pool, router *gin.Engine) *gin.Engine {
 	limiterMiddleware := newLimiter(
 		poolRedis,
 		getHashBody,
 		abortRequest,
-		getDuration(os.Getenv("LIMITER"), 10),
+		getDuration(os.Getenv("LIMITER"), 600),
 	)
 
 	router.POST("/v1/products",
@@ -66,6 +64,6 @@ func setupRouter(poolRedis *redis.Pool) *gin.Engine {
 func main() {
 	redisHost := getEnv("REDIS_HOST", "localhost:6379")
 	poolRedis := newRedis(redisHost)
-	router := setupRouter(poolRedis)
-	router.Run()
+	server := setupRouter(poolRedis, gin.Default())
+	server.Run()
 }
