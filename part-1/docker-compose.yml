@@ -7,7 +7,7 @@ services:
     environment:
       - PORT=8080
       - REDIS_HOST=redis:6379
-      - LIMITER=10
+      - LIMITER=600
       - GIN_MODE=release
     depends_on: 
       - redis

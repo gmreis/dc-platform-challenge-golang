@@ -12,7 +12,7 @@ import (
 
 func TestValidateMiddleware(t *testing.T) {
 
-	t.Run("Call next handler if body is a JSON and Content-type is application/JSON", func(t *testing.T) {
+	t.Run("Call next handler if body is a object JSON and Content-type is application/JSON", func(t *testing.T) {
 		gin.SetMode(gin.TestMode)
 
 		resp := httptest.NewRecorder()
@@ -26,6 +26,29 @@ func TestValidateMiddleware(t *testing.T) {
 		)
 
 		body := []byte("{\"id\": 123}")
+		ctx.Request, _ = http.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+		ctx.Request.Header.Set("Content-Type", "application/json")
+
+		server.ServeHTTP(resp, ctx.Request)
+
+		assert.Equal(t, resp.Code, http.StatusOK, "Status code should be 200")
+		assert.Equal(t, resp.Body.String(), "Finish", "Body should be 'Finish' string")
+	})
+
+	t.Run("Call next handler if body is a array JSON and Content-type is application/JSON", func(t *testing.T) {
+		gin.SetMode(gin.TestMode)
+
+		resp := httptest.NewRecorder()
+		ctx, server := gin.CreateTestContext(resp)
+
+		server.Use(
+			validateMiddleware,
+			func(c *gin.Context) {
+				c.String(http.StatusOK, "Finish")
+			},
+		)
+
+		body := []byte("[{\"id\": 123}]")
 		ctx.Request, _ = http.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
 		ctx.Request.Header.Set("Content-Type", "application/json")
 
