@@ -4,26 +4,26 @@ import (
 	"sync"
 )
 
-// ProductType ...
+// ProductType is a product with its images.
 type ProductType struct {
 	sync.Mutex
-	ProductID string
-	Images    []string
+	ProductID string   `json:"productId"`
+	Images    []string `json:"images"`
 }
 
-// SafeAppend ...
+// SafeAppend append a image in product.
 func (product *ProductType) SafeAppend(image string) {
 	product.Lock()
 	defer product.Unlock()
 	product.Images = append(product.Images, image)
 }
 
-// ProductMap ...
+// ProductMap is a map of ProductType
 type ProductMap map[string]*ProductType
 
-// ProductAggregator ...
-func ProductAggregator(input chan *ImageType) (output chan *ProductMap) {
-	output = make(chan *ProductMap)
+// ProductAggregator joint images in a product if image status is 200.
+func ProductAggregator(input chan *ImageType) (output chan ProductMap) {
+	output = make(chan ProductMap)
 	productMap := make(ProductMap)
 
 	go func() {
@@ -43,7 +43,7 @@ func ProductAggregator(input chan *ImageType) (output chan *ProductMap) {
 				}
 			}
 		}
-		output <- &productMap
+		output <- productMap
 		close(output)
 	}()
 

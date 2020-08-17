@@ -1,27 +1,26 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 )
 
-// WriteFile ...
-func WriteFile(input chan *ProductMap, dumpName string) {
-	file, err := os.Create(dumpName + "-result")
+// WriteFile write in file and return boolean after finished.
+func WriteFile(input chan string, fileName string) (output chan bool) {
+	file, err := os.Create(fileName)
 
 	if err != nil {
 		panic(err)
 	}
 
-	productMap := <-input
-	for _, product := range *productMap {
-		data, _ := json.Marshal(product)
-		_, err = fmt.Fprintln(file, string(data))
-
-		if err != nil {
-			panic(err)
+	output = make(chan bool)
+	go func() {
+		for data := range input {
+			_, err = fmt.Fprintln(file, data)
 		}
-	}
+		output <- true
+		close(output)
+	}()
 
+	return
 }

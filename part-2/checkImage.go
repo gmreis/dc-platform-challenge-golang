@@ -4,7 +4,8 @@ import (
 	"net/http"
 )
 
-func getStatusByRequest(url string) int {
+// GetStatusByRequest make request in URL and return status code.
+func GetStatusByRequest(url string) int {
 	resp, err := http.Get(url)
 
 	if err != nil {
@@ -15,13 +16,13 @@ func getStatusByRequest(url string) int {
 	return resp.StatusCode
 }
 
-// CheckImage ...
+// CheckImage check status of URL.
 func CheckImage(input chan *ImageType) (output chan *ImageType) {
-	output = make(chan *ImageType)
+	output = make(chan *ImageType, 1024)
 
 	go func() {
 		for image := range input {
-			image.SafeSetStatus(getStatusByRequest(image.URL))
+			image.SafeSetStatus(GetStatusByRequest(image.URL))
 			output <- image
 		}
 		close(output)

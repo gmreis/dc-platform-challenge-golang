@@ -7,9 +7,9 @@ import (
 	"strings"
 )
 
-// ReadFileByLine ...
+// ReadFileByLine read file and return line by line.
 func ReadFileByLine(filePath string) (output chan string) {
-	output = make(chan string)
+	output = make(chan string, 1024)
 
 	file, err := os.Open(filePath)
 
@@ -22,14 +22,13 @@ func ReadFileByLine(filePath string) (output chan string) {
 			for {
 				line, err = reader.ReadString('\n')
 
-				if err != nil {
-					break
-				}
-
 				line = strings.TrimSpace(line)
-
 				if len(line) > 0 {
 					output <- line
+				}
+
+				if err != nil {
+					break
 				}
 			}
 
