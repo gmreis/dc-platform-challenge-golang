@@ -1,0 +1,12 @@
+FROM ruby:2.5
+
+WORKDIR /usr/src/app
+
+COPY Gemfile ./
+
+RUN bundle install --standalone --clean
+RUN gem install sinatra
+
+COPY url-aggregator-api.rb ./
+
+ENTRYPOINT ["ruby", "url-aggregator-api.rb"]
